@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD en HTML</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>CRUD en HTML</h1>
+
+    <form id="crud-form">
+        <label for="name">Nombre:</label>
+        <input type="text" id="name" required>
+        <label for="email">Correo Electrónico:</label>
+        <input type="email" id="email" required>
+        <button type="button" onclick="saveData()">Guardar</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Correo Electrónico</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="data-table-body"></tbody>
+    </table>
+
+    <script>
+        // Función para guardar datos en el almacenamiento local
+        function saveData() {
+            var name = document.getElementById("name").value;
+            var email = document.getElementById("email").value;
+
+            if (name && email) {
+                var data = {
+                    name: name,
+                    email: email
+                };
+
+                // Obtener los datos existentes o inicializar un array vacío
+                var existingData = JSON.parse(localStorage.getItem("crudData")) || [];
+
+                // Agregar el nuevo dato
+                existingData.push(data);
+
+                // Guardar los datos actualizados en el almacenamiento local
+                localStorage.setItem("crudData", JSON.stringify(existingData));
+
+                // Limpiar el formulario
+                document.getElementById("crud-form").reset();
+
+                // Actualizar la tabla
+                displayData();
+            }
+        }
+
+        // Función para mostrar los datos en la tabla
+        function displayData() {
+            var tableBody = document.getElementById("data-table-body");
+            tableBody.innerHTML = "";
+
+            var data = JSON.parse(localStorage.getItem("crudData")) || [];
+
+            data.forEach(function(item, index) {
+                var row = tableBody.insertRow();
+                var cell1 = row.insertCell(0);
+                var cell2 = row.insertCell(1);
+                var cell3 = row.insertCell(2);
+
+                cell1.innerHTML = item.name;
+                cell2.innerHTML = item.email;
+                cell3.innerHTML = `<button onclick="editData(${index})">Editar</button> | <button onclick="deleteData(${index})">Eliminar</button>`;
+            });
+        }
+
+        // Función para editar datos
+        function editData(index) {
+            var data = JSON.parse(localStorage.getItem("crudData")) || [];
+            var item = data[index];
+
+            document.getElementById("name").value = item.name;
+            document.getElementById("email").value = item.email;
+
+            // Eliminar el dato antiguo
+            data.splice(index, 1);
+
+            // Guardar los datos actualizados en el almacenamiento local
+            localStorage.setItem("crudData", JSON.stringify(data));
+
+            // Actualizar la tabla
+            displayData();
+        }
+
+        // Función para eliminar datos
+        function deleteData(index) {
+            var data = JSON.parse(localStorage.getItem("crudData")) || [];
+
+            // Eliminar el dato
+            data.splice(index, 1);
+
+            // Guardar los datos actualizados en el almacenamiento local
+            localStorage.setItem("crudData", JSON.stringify(data));
+
+            // Actualizar la tabla
+            displayData();
+        }
+
+        // Mostrar los datos al cargar la página
+        displayData();
+    </script>
+
+</body>
+</html>
